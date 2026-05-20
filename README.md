@@ -2,6 +2,8 @@
 
 A local, **client-side only** JSON and JWT tool built with Nuxt. Format and explore JSON with a collapsible tree, and encode or decode tokens (HS256 / RS256), edit claims in a form, and verify signatures — all in your browser.
 
+**Live app:** [https://jsonutility.bijaybhandari.com/](https://jsonutility.bijaybhandari.com/)
+
 ## Features
 
 ### Three workspaces
@@ -86,7 +88,7 @@ Pushes to `main` and pull requests against `main` build the static site (`npm ru
 
 | Trigger | Environment |
 |---------|-------------|
-| Push to `main` | **production** (`json-utility.pages.dev`) |
+| Push to `main` | **production** ([jsonutility.bijaybhandari.com](https://jsonutility.bijaybhandari.com/)) |
 | Pull request | **preview** (`pr-<number>.json-utility.pages.dev`) |
 | Manual run (**Actions → Run workflow**) | Choose **preview** or **production** |
 
@@ -106,7 +108,7 @@ Pushes to `main` and pull requests against `main` build the static site (`npm ru
 4. **Push to GitHub**  
    Connect this repo to GitHub and push `main`. The workflow [`.github/workflows/deploy-cloudflare-pages.yml`](.github/workflows/deploy-cloudflare-pages.yml) runs automatically.
 
-On the first deploy, the workflow runs `wrangler pages project create json-utility` (then deploys). Production URL: `https://json-utility.pages.dev` (or your custom domain).
+On the first deploy, the workflow runs `wrangler pages project create json-utility` (then deploys). Production URL: [https://jsonutility.bijaybhandari.com/](https://jsonutility.bijaybhandari.com/)
 
 You can also create the project once in the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **Workers & Pages** → **Create** → **Pages** → **Upload assets** → project name `json-utility`.
 
@@ -172,3 +174,9 @@ app/
 ├── assets/css/       # Global styles and layout
 └── pages/            # Single-page app (index)
 ```
+
+## License
+
+Copyright 2026 Bijay Bhandari
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full text.
