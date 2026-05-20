@@ -80,6 +80,40 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Deploy to Cloudflare Pages (GitHub Actions)
+
+Pushes to `main` and pull requests against `main` build the static site (`npm run generate`) and deploy `.output/public` to [Cloudflare Pages](https://developers.cloudflare.com/pages/) via [Wrangler](https://developers.cloudflare.com/workers/wrangler/).
+
+### One-time setup
+
+1. **Create a Cloudflare API token**  
+   [Dashboard → API Tokens](https://dash.cloudflare.com/?to=/:account/api-tokens) → Create Token → Custom token with **Account → Cloudflare Pages → Edit**.
+
+2. **Get your Account ID**  
+   [Dashboard → Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → Overview → copy **Account ID** from the right sidebar.
+
+3. **Add GitHub repository secrets**  
+   Repo → **Settings → Secrets and variables → Actions → New repository secret**:
+   - `CLOUDFLARE_API_TOKEN` — token from step 1
+   - `CLOUDFLARE_ACCOUNT_ID` — account ID from step 2
+
+4. **Push to GitHub**  
+   Connect this repo to GitHub and push `main`. The workflow [`.github/workflows/deploy-cloudflare-pages.yml`](.github/workflows/deploy-cloudflare-pages.yml) runs automatically.
+
+On the first deploy, Wrangler creates the Pages project **`json-utility`** if it does not exist. Production URL: `https://json-utility.pages.dev` (or your custom domain).
+
+Pull requests get **preview deployments** (Wrangler uses `GITHUB_TOKEN` to comment on the PR).
+
+### Manual deploy (optional)
+
+```bash
+npm ci
+npm run generate
+npx wrangler pages deploy .output/public --project-name=json-utility
+```
+
+Requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment, or `wrangler login`.
+
 ## Docker
 
 Requires [Docker](https://docs.docker.com/get-docker/) (Docker Desktop or Docker Engine).
