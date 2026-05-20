@@ -100,7 +100,9 @@ Pushes to `main` and pull requests against `main` build the static site (`npm ru
 4. **Push to GitHub**  
    Connect this repo to GitHub and push `main`. The workflow [`.github/workflows/deploy-cloudflare-pages.yml`](.github/workflows/deploy-cloudflare-pages.yml) runs automatically.
 
-On the first deploy, Wrangler creates the Pages project **`json-utility`** if it does not exist. Production URL: `https://json-utility.pages.dev` (or your custom domain).
+On the first deploy, the workflow runs `wrangler pages project create json-utility` (then deploys). Production URL: `https://json-utility.pages.dev` (or your custom domain).
+
+You can also create the project once in the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **Workers & Pages** → **Create** → **Pages** → **Upload assets** → project name `json-utility`.
 
 Pull requests get **preview deployments** (Wrangler uses `GITHUB_TOKEN` to comment on the PR).
 
