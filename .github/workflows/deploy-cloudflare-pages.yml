@@ -8,15 +8,26 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
 
 concurrency:
-  group: cloudflare-pages-${{ github.ref }}
+  group: cloudflare-pages-${{ github.event_name == 'workflow_dispatch' && format('manual-{0}', github.event.inputs.environment) || github.ref }}
   cancel-in-progress: true
 
 jobs:
   deploy:
-    name: Build and deploy
+    name: Deploy (${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.event_name == 'pull_request' && 'preview' || 'production') }})
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.event_name == 'pull_request' && 'preview' || 'production') }}
     permissions:
       contents: read
       deployments: write
@@ -48,6 +59,19 @@ jobs:
             exit 1
           fi
 
+      - name: Set deployment target
+        id: target
+        run: |
+          if [ "$DEPLOY_ENV" = "production" ]; then
+            echo "wrangler_deploy=pages deploy .output/public --project-name=json-utility --commit-hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "wrangler_deploy=pages deploy .output/public --project-name=json-utility --branch=pr-${{ github.event.pull_request.number }} --commit-hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          else
+            echo "wrangler_deploy=pages deploy .output/public --project-name=json-utility --branch=preview-${{ github.run_id }} --commit-hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         env:
@@ -58,5 +82,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
             pages project create json-utility --production-branch=main || true
-            pages deploy .output/public --project-name=json-utility
+            ${{ steps.target.outputs.wrangler_deploy }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}

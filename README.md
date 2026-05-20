@@ -84,6 +84,12 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Pushes to `main` and pull requests against `main` build the static site (`npm run generate`) and deploy `.output/public` to [Cloudflare Pages](https://developers.cloudflare.com/pages/) via [Wrangler](https://developers.cloudflare.com/workers/wrangler/).
 
+| Trigger | Environment |
+|---------|-------------|
+| Push to `main` | **production** (`json-utility.pages.dev`) |
+| Pull request | **preview** (`pr-<number>.json-utility.pages.dev`) |
+| Manual run (**Actions → Run workflow**) | Choose **preview** or **production** |
+
 ### One-time setup
 
 1. **Create a Cloudflare API token**  
