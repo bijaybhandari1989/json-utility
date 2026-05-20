@@ -1,0 +1,14 @@
+services:
+  json-utility:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: json-utility:latest
+    container_name: json-utility
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+    restart: unless-stopped
