@@ -25,11 +25,12 @@ export function splitJwt(token: unknown): JwtSegments | null {
     }
   }
 
+  const signature = trimmed.slice(secondDot + 1)
   return {
     header: trimmed.slice(0, firstDot),
     payload: trimmed.slice(firstDot + 1, secondDot),
-    signature: trimmed.slice(secondDot + 1),
-    hasSignature: true,
+    signature,
+    hasSignature: signature.length > 0,
   }
 }
 
@@ -60,13 +61,15 @@ export function renderColoredJwtHtml(token: unknown): string {
   }
 
   const payload = escapeHtml(segments.payload)
-  const signature = escapeHtml(segments.signature)
+  const signaturePart = segments.hasSignature
+    ? `<span class="jwt-part jwt-signature">${escapeHtml(segments.signature)}</span>`
+    : '<span class="jwt-part jwt-signature jwt-signature-empty">(no signature)</span>'
 
   return [
     `<span class="jwt-part jwt-header">${header}</span>`,
     '<span class="jwt-dot">.</span>',
     `<span class="jwt-part jwt-payload">${payload}</span>`,
     '<span class="jwt-dot">.</span>',
-    `<span class="jwt-part jwt-signature">${signature}</span>`,
+    signaturePart,
   ].join('')
 }

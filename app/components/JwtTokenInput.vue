@@ -132,6 +132,12 @@ const coloredHtml = computed(() => renderColoredJwtHtml(tokenText.value))
   color: var(--jwt-signature);
 }
 
+.jwt-colored-mirror :deep(.jwt-signature-empty) {
+  color: var(--text-subtle);
+  font-style: italic;
+  font-weight: 400;
+}
+
 .jwt-colored-mirror :deep(.jwt-dot) {
   color: var(--text-muted);
   font-weight: 700;

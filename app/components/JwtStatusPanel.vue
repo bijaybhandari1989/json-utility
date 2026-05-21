@@ -2,6 +2,7 @@
 defineProps<{
   jwtValid: boolean
   signatureVerified: boolean
+  hasSignature: boolean
   visible: boolean
 }>()
 </script>
@@ -12,9 +13,20 @@ defineProps<{
       <span class="status-dot" aria-hidden="true" />
       {{ jwtValid ? 'Valid JWT' : 'Invalid JWT' }}
     </div>
-    <div class="status-chip" :class="signatureVerified ? 'ok' : 'bad'">
+    <div
+      class="status-chip"
+      :class="
+        !hasSignature ? 'warn' : signatureVerified ? 'ok' : 'bad'
+      "
+    >
       <span class="status-dot" aria-hidden="true" />
-      {{ signatureVerified ? 'Signature Verified' : 'Signature Not Verified' }}
+      {{
+        !hasSignature
+          ? 'Unsigned (no signature segment)'
+          : signatureVerified
+            ? 'Signature Verified'
+            : 'Signature Not Verified'
+      }}
     </div>
   </div>
 </template>
@@ -52,5 +64,10 @@ defineProps<{
 .status-chip.bad {
   background: var(--danger-soft);
   color: var(--danger);
+}
+
+.status-chip.warn {
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  color: var(--warning);
 }
 </style>

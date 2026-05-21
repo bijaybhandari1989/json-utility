@@ -14,6 +14,7 @@ const {
   showJwtStatus,
   jwtValid,
   signatureVerified,
+  tokenHasSignature,
   formatHeader,
   loadSample,
   clearAll,
@@ -55,12 +56,13 @@ function setPayloadError(message: string) {
       </div>
       <div class="card-body">
         <p class="hint-text decode-hint">
-          Paste a token to decode. Editing header or payload rebuilds the JWT; changing the key only re-verifies.
+          Paste a signed JWT to decode. The signature appears as the third (teal) segment. Use Encode to edit and re-sign.
         </p>
         <JwtTokenInput v-model="token" />
         <JwtStatusPanel
           :visible="showJwtStatus"
           :jwt-valid="jwtValid"
+          :has-signature="tokenHasSignature"
           :signature-verified="signatureVerified"
         />
         <p v-if="tokenError" class="error-text">

@@ -6,6 +6,7 @@ import {
 import type { JwtAlgorithm, KeyFormat, KeyRole } from '~/types/jwt'
 import { getDefaultPayloadObject } from '~/composables/usePayloadClaims'
 import { snapshotJson, toPlainObject } from '~/utils/plain'
+import { splitJwt } from '~/utils/jwtSegments'
 import { asJwtString } from '~/utils/string'
 import {
   decodeTokenUnsafe,
@@ -15,7 +16,10 @@ import {
   syncTokenFromEditors,
   verifyToken,
 } from '~/composables/useJwt'
-import { SAMPLE_JWT, SAMPLE_SECRET } from '~/constants/samples'
+import {
+  getJwtAlgorithmSample,
+  getSampleKeyMaterial,
+} from '~/constants/jwtSamples'
 
 export type AppTab = 'encode' | 'decode' | 'format'
 
@@ -41,8 +45,13 @@ function createWorkbench() {
   const suppressTokenDecode = ref(false)
   const suppressAutoEncode = ref(false)
   const isInternalTokenUpdate = ref(false)
+  let algorithmSetByDecode = false
 
   const showJwtStatus = computed(() => asJwtString(token.value).trim().length > 0)
+
+  const tokenHasSignature = computed(
+    () => splitJwt(token.value)?.hasSignature ?? false,
+  )
 
   const payloadSnapshot = computed(() => snapshotJson(payloadObject.value))
   const credentialsSnapshot = computed(() =>
@@ -53,21 +62,31 @@ function createWorkbench() {
     }),
   )
 
+  function applyAlgorithmSample(alg: JwtAlgorithm = algorithm.value) {
+    const sample = getJwtAlgorithmSample(alg)
+    const mode = activeTab.value === 'encode' ? 'encode' : 'decode'
+    const key = getSampleKeyMaterial(alg, mode)
+
+    suppressTokenDecode.value = true
+    token.value = sample.jwt
+    keyMaterial.value = key.keyMaterial
+    keyFormat.value = key.keyFormat
+    keyRole.value = key.keyRole
+    suppressTokenDecode.value = false
+    void decodeFromToken()
+  }
+
   watch(algorithm, (alg) => {
     headerError.value = ''
-    if (isHmacAlgorithm(alg)) {
-      keyFormat.value = keyFormat.value === 'pem' ? 'text' : keyFormat.value
-      keyRole.value = 'secret'
-    } else {
-      keyFormat.value = 'pem'
-      keyRole.value = 'private'
-    }
     try {
       const header = parseJsonObject(headerText.value, 'Header')
       header.alg = alg
       headerText.value = formatJson(header)
     } catch {
       headerText.value = getDefaultHeader(alg)
+    }
+    if (!algorithmSetByDecode) {
+      applyAlgorithmSample(alg)
     }
   })
 
@@ -107,6 +126,11 @@ function createWorkbench() {
       const headerAlg = header.alg as string | undefined
       if (headerAlg && isSupportedJwtAlgorithm(headerAlg)) {
         verifyAlgorithm = headerAlg
+        if (headerAlg !== algorithm.value) {
+          algorithmSetByDecode = true
+          algorithm.value = headerAlg
+          algorithmSetByDecode = false
+        }
       }
     } catch {
       jwtValid.value = false
@@ -158,7 +182,9 @@ function createWorkbench() {
 
       const headerAlg = header.alg as string | undefined
       if (headerAlg && isSupportedJwtAlgorithm(headerAlg)) {
+        algorithmSetByDecode = true
         algorithm.value = headerAlg
+        algorithmSetByDecode = false
       }
 
       await assessJwt(trimmed)
@@ -214,6 +240,8 @@ function createWorkbench() {
   const reassessDebounced = useDebounceFn(() => assessJwt(), 250)
 
   watch([payloadSnapshot, headerText], () => {
+    // Decode tab: keep the pasted/sampled token intact; only re-sign on Encode.
+    if (activeTab.value !== 'encode') return
     syncJwtDebounced()
   })
 
@@ -225,7 +253,12 @@ function createWorkbench() {
     if (tab === 'format') return
 
     if (isAsymmetricAlgorithm(algorithm.value)) {
-      keyRole.value = tab === 'encode' ? 'private' : 'public'
+      const key = getSampleKeyMaterial(
+        algorithm.value,
+        tab === 'encode' ? 'encode' : 'decode',
+      )
+      keyRole.value = key.keyRole
+      keyMaterial.value = key.keyMaterial
     }
     if (tab === 'encode') {
       syncJwtDebounced()
@@ -248,18 +281,9 @@ function createWorkbench() {
     await syncJwtFromEditors()
   }
 
-  function applySampleData() {
-    token.value = SAMPLE_JWT
-    keyMaterial.value = SAMPLE_SECRET
-    algorithm.value = 'HS256'
-    keyFormat.value = 'text'
-    keyRole.value = 'secret'
-  }
-
   function loadSample() {
     activeTab.value = 'decode'
-    applySampleData()
-    void decodeFromToken()
+    applyAlgorithmSample(algorithm.value)
   }
 
   function clearAll() {
@@ -293,10 +317,7 @@ function createWorkbench() {
     payloadError.value = ''
   }
 
-  suppressTokenDecode.value = true
-  applySampleData()
-  suppressTokenDecode.value = false
-  void decodeFromToken()
+  applyAlgorithmSample('HS256')
 
   return {
     activeTab,
@@ -313,6 +334,7 @@ function createWorkbench() {
     actionError,
     jwtValid,
     signatureVerified,
+    tokenHasSignature,
     isSyncing,
     showJwtStatus,
     formatHeader,

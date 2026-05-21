@@ -1,7 +1,8 @@
-export const SAMPLE_JWT =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzhmM2EyYjFjIiwibmFtZSI6IkFsZXggUml2ZXJhIiwiZW1haWwiOiJhbGV4QGV4YW1wbGUuY29tIiwicm9sZXMiOlsidXNlciIsImFkbWluIl0sImlhdCI6MTc3OTI4NTkyNCwibmJmIjoxNzc5Mjg1OTI0LCJleHAiOjE3Nzk0MjQ5Mjd9.R1gxLSF0G9WMMXrY30ArKjpofiF-jyL2GeZkWknK_oY'
+import { JWT_ALGORITHM_SAMPLES } from '~/constants/jwtSamples.generated'
 
-export const SAMPLE_SECRET = 'your-256-bit-secret'
+export const SAMPLE_JWT = JWT_ALGORITHM_SAMPLES.HS256.jwt
+
+export const SAMPLE_SECRET = JWT_ALGORITHM_SAMPLES.HS256.hmacSecret!
 
 export const SAMPLE_JSON = JSON.stringify(
   {

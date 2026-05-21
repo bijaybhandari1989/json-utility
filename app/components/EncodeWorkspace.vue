@@ -14,6 +14,7 @@ const {
   showJwtStatus,
   jwtValid,
   signatureVerified,
+  tokenHasSignature,
   formatHeader,
   generateJwt,
   loadSample,
@@ -70,6 +71,7 @@ function setPayloadError(message: string) {
         <JwtStatusPanel
           :visible="showJwtStatus"
           :jwt-valid="jwtValid"
+          :has-signature="tokenHasSignature"
           :signature-verified="signatureVerified"
         />
       </div>
