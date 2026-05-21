@@ -38,10 +38,7 @@ function setPayloadError(message: string) {
     <div class="toolbar">
       <label class="field-label inline">
         Algorithm
-        <select v-model="algorithm" class="field-select">
-          <option value="HS256">HS256</option>
-          <option value="RS256">RS256</option>
-        </select>
+        <AlgorithmSelect v-model="algorithm" />
       </label>
       <button type="button" class="btn btn-ghost btn-sm" @click="loadSample">
         Sample

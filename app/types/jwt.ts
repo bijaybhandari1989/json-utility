@@ -1,4 +1,4 @@
-export type JwtAlgorithm = 'HS256' | 'RS256'
+export type { JwtAlgorithm } from '~/constants/jwtAlgorithms'
 export type KeyFormat = 'text' | 'pem' | 'base64'
 export type KeyRole = 'secret' | 'private' | 'public'
 

@@ -1,3 +1,8 @@
+import {
+  isAsymmetricAlgorithm,
+  isHmacAlgorithm,
+  isSupportedJwtAlgorithm,
+} from '~/constants/jwtAlgorithms'
 import type { JwtAlgorithm, KeyFormat, KeyRole } from '~/types/jwt'
 import { getDefaultPayloadObject } from '~/composables/usePayloadClaims'
 import { snapshotJson, toPlainObject } from '~/utils/plain'
@@ -50,7 +55,7 @@ function createWorkbench() {
 
   watch(algorithm, (alg) => {
     headerError.value = ''
-    if (alg === 'HS256') {
+    if (isHmacAlgorithm(alg)) {
       keyFormat.value = keyFormat.value === 'pem' ? 'text' : keyFormat.value
       keyRole.value = 'secret'
     } else {
@@ -100,7 +105,7 @@ function createWorkbench() {
       const { header } = decodeTokenUnsafe(jwtStr)
       jwtValid.value = true
       const headerAlg = header.alg as string | undefined
-      if (headerAlg === 'HS256' || headerAlg === 'RS256') {
+      if (headerAlg && isSupportedJwtAlgorithm(headerAlg)) {
         verifyAlgorithm = headerAlg
       }
     } catch {
@@ -118,8 +123,9 @@ function createWorkbench() {
       return
     }
 
-    const role: KeyRole =
-      verifyAlgorithm === 'HS256' ? 'secret' : keyRole.value
+    const role: KeyRole = isHmacAlgorithm(verifyAlgorithm)
+      ? 'secret'
+      : keyRole.value
 
     const result = await verifyToken(
       jwtStr,
@@ -151,7 +157,7 @@ function createWorkbench() {
       payloadError.value = ''
 
       const headerAlg = header.alg as string | undefined
-      if (headerAlg === 'HS256' || headerAlg === 'RS256') {
+      if (headerAlg && isSupportedJwtAlgorithm(headerAlg)) {
         algorithm.value = headerAlg
       }
 
@@ -218,7 +224,7 @@ function createWorkbench() {
   watch(activeTab, (tab) => {
     if (tab === 'format') return
 
-    if (algorithm.value === 'RS256') {
+    if (isAsymmetricAlgorithm(algorithm.value)) {
       keyRole.value = tab === 'encode' ? 'private' : 'public'
     }
     if (tab === 'encode') {

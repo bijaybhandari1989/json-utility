@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import {
+  getJwtKeyFamily,
+  isAsymmetricAlgorithm,
+  isHmacAlgorithm,
+} from '~/constants/jwtAlgorithms'
 import type { JwtAlgorithm, KeyFormat, KeyRole } from '~/types/jwt'
 
 const keyMaterial = defineModel<string>('keyMaterial', { required: true })
 const keyFormat = defineModel<KeyFormat>('keyFormat', { required: true })
 const keyRole = defineModel<KeyRole>('keyRole', { required: true })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     algorithm: JwtAlgorithm
     mode?: 'sign' | 'verify'
@@ -15,13 +20,35 @@ withDefaults(
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
+const keyFamily = computed(() => getJwtKeyFamily(props.algorithm))
+
 const placeholder = computed(() => {
   if (keyFormat.value === 'pem') {
     return keyRole.value === 'private'
       ? '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
       : '-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----'
   }
-  return 'Enter HMAC secret'
+  return `Enter ${props.algorithm} secret`
+})
+
+const signHint = computed(() => {
+  if (isHmacAlgorithm(props.algorithm)) {
+    return `${props.algorithm} uses a shared secret to sign the token.`
+  }
+  if (keyFamily.value === 'ec') {
+    return `${props.algorithm} requires an EC private key in PEM format to sign.`
+  }
+  if (keyFamily.value === 'eddsa') {
+    return 'EdDSA requires an Ed25519 private key in PEM format to sign.'
+  }
+  return `${props.algorithm} requires an RSA private key in PEM format to sign.`
+})
+
+const verifyHint = computed(() => {
+  if (isHmacAlgorithm(props.algorithm)) {
+    return 'Enter the shared secret to verify the signature.'
+  }
+  return 'Use the public key to verify. Switch to Encode to sign with a private key.'
 })
 
 function onFileChange(event: Event) {
@@ -46,7 +73,12 @@ function openFilePicker() {
   <section class="card key-panel">
     <div class="card-header">
       <span class="card-title">{{ mode === 'verify' ? 'Verify signature' : 'Signing key' }}</span>
-      <button type="button" class="btn btn-sm" @click="openFilePicker">
+      <button
+        v-if="isAsymmetricAlgorithm(algorithm)"
+        type="button"
+        class="btn btn-sm"
+        @click="openFilePicker"
+      >
         Upload .pem
       </button>
       <input
@@ -62,12 +94,14 @@ function openFilePicker() {
         <label class="field-label">
           Format
           <select v-model="keyFormat" class="field-select">
-            <option v-if="algorithm === 'HS256'" value="text">Plain text</option>
-            <option v-if="algorithm === 'HS256'" value="base64">Base64</option>
-            <option v-if="algorithm === 'RS256'" value="pem">PEM</option>
+            <template v-if="isHmacAlgorithm(algorithm)">
+              <option value="text">Plain text</option>
+              <option value="base64">Base64</option>
+            </template>
+            <option v-else value="pem">PEM</option>
           </select>
         </label>
-        <label v-if="algorithm === 'RS256'" class="field-label">
+        <label v-if="isAsymmetricAlgorithm(algorithm)" class="field-label">
           Key type
           <select v-model="keyRole" class="field-select">
             <option value="public">Public (verify)</option>
@@ -83,20 +117,7 @@ function openFilePicker() {
         rows="5"
       />
       <p class="hint-text">
-        <template v-if="mode === 'verify'">
-          <template v-if="algorithm === 'HS256'">
-            Enter the shared secret to verify the signature.
-          </template>
-          <template v-else>
-            Use the public key to verify. Switch to Encode to sign with a private key.
-          </template>
-        </template>
-        <template v-else-if="algorithm === 'HS256'">
-          HS256 uses a shared secret to sign the token.
-        </template>
-        <template v-else>
-          RS256 requires a private key in PEM format to sign.
-        </template>
+        {{ mode === 'verify' ? verifyHint : signHint }}
       </p>
     </div>
   </section>

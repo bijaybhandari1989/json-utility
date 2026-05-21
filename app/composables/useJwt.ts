@@ -7,7 +7,12 @@ import {
   importSPKI,
   jwtVerify,
 } from 'jose'
-import type { JwtAlgorithm, KeyFormat, KeyRole, VerifyResult } from '~/types/jwt'
+import {
+  isAsymmetricAlgorithm,
+  isHmacAlgorithm,
+  type JwtAlgorithm,
+} from '~/constants/jwtAlgorithms'
+import type { KeyFormat, KeyRole, VerifyResult } from '~/types/jwt'
 import { toPlainObject } from '~/utils/plain'
 import { asJwtString } from '~/utils/string'
 
@@ -62,10 +67,14 @@ export function decodeTokenUnsafe(token: unknown) {
   }
 }
 
-function resolveHmacSecret(secret: string, format: KeyFormat): Uint8Array {
+function resolveHmacSecret(
+  secret: string,
+  format: KeyFormat,
+  algorithm: JwtAlgorithm,
+): Uint8Array {
   const value = secret.trim()
   if (!value) {
-    throw new Error('Secret is required for HS256')
+    throw new Error(`Secret is required for ${algorithm}`)
   }
   if (format === 'base64') {
     const normalized = value.replace(/\s/g, '')
@@ -75,14 +84,14 @@ function resolveHmacSecret(secret: string, format: KeyFormat): Uint8Array {
   return new TextEncoder().encode(value)
 }
 
-async function resolveRsaKey(
+async function resolveAsymmetricKey(
   pem: string,
   algorithm: JwtAlgorithm,
   role: 'private' | 'public',
 ) {
   const value = pem.trim()
   if (!value) {
-    throw new Error(`RSA ${role} key is required for ${algorithm}`)
+    throw new Error(`${role === 'private' ? 'Private' : 'Public'} key is required for ${algorithm}`)
   }
   if (role === 'private') {
     return importPKCS8(value, algorithm)
@@ -108,7 +117,7 @@ export function canSignToken(
   keyRole: KeyRole,
 ): boolean {
   if (!keyMaterial.trim()) return false
-  if (algorithm === 'RS256' && keyRole !== 'private') return false
+  if (isAsymmetricAlgorithm(algorithm) && keyRole !== 'private') return false
   return true
 }
 
@@ -140,12 +149,12 @@ export async function encodeToken(
 
   const signer = new SignJWT(toPlainObject(payload)).setProtectedHeader(protectedHeader)
 
-  if (algorithm === 'HS256') {
-    const secret = resolveHmacSecret(keyMaterial, keyFormat)
+  if (isHmacAlgorithm(algorithm)) {
+    const secret = resolveHmacSecret(keyMaterial, keyFormat, algorithm)
     return signer.sign(secret)
   }
 
-  const privateKey = await resolveRsaKey(keyMaterial, algorithm, 'private')
+  const privateKey = await resolveAsymmetricKey(keyMaterial, algorithm, 'private')
   return signer.sign(privateKey)
 }
 
@@ -189,15 +198,15 @@ export async function verifyToken(
   }
 
   try {
-    if (algorithm === 'HS256') {
-      const secret = resolveHmacSecret(keyMaterial, keyFormat)
-      await jwtVerify(trimmed, secret, { algorithms: ['HS256'] })
+    if (isHmacAlgorithm(algorithm)) {
+      const secret = resolveHmacSecret(keyMaterial, keyFormat, algorithm)
+      await jwtVerify(trimmed, secret, { algorithms: [algorithm] })
       return { valid: true }
     }
 
     const role = keyRole === 'private' ? 'private' : 'public'
-    const key = await resolveRsaKey(keyMaterial, algorithm, role)
-    await jwtVerify(trimmed, key, { algorithms: ['RS256'] })
+    const key = await resolveAsymmetricKey(keyMaterial, algorithm, role)
+    await jwtVerify(trimmed, key, { algorithms: [algorithm] })
     return { valid: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Verification failed'

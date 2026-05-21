@@ -1,6 +1,6 @@
 # JSON Utilities
 
-A local, **client-side only** JSON and JWT tool built with Nuxt. Format and explore JSON with a collapsible tree, and encode or decode tokens (HS256 / RS256), edit claims in a form, and verify signatures — all in your browser.
+A local, **client-side only** JSON and JWT tool built with Nuxt. Format and explore JSON with a collapsible tree, and encode or decode tokens (HMAC, RSA, ECDSA, RSA-PSS, EdDSA), edit claims in a form, and verify signatures — all in your browser.
 
 **Live app:** [https://jsonutility.bijaybhandari.com/](https://jsonutility.bijaybhandari.com/) · **Source:** [github.com/bijaybhandari1989/json-utility](https://github.com/bijaybhandari1989/json-utility)
 
@@ -21,7 +21,7 @@ A local, **client-side only** JSON and JWT tool built with Nuxt. Format and expl
 - **Status** — Valid JWT / Invalid JWT and Signature Verified / Signature Not Verified
 - **Header & payload (JSON)** — Editable header JSON and read-only payload preview in one panel
 - **Payload** — Form-based claim editor (string, number, boolean, null, JSON types) with add/remove rows
-- **Verify signature** — HS256 shared secret or RS256 public key (plain text, Base64, PEM, file upload)
+- **Verify signature** — HMAC secret or asymmetric public key (plain text, Base64, PEM, file upload)
 - **Smart updates** — Editing header or payload rebuilds the token; changing the key only re-verifies (does not re-sign)
 - **Toolbar** — Load sample (jwt.io demo token + secret), Clear, algorithm selector
 
@@ -30,7 +30,7 @@ A local, **client-side only** JSON and JWT tool built with Nuxt. Format and expl
 - **Signed JWT** — Live colored output at the top; regenerates when header or payload change
 - **Header & payload (JSON)** — Same split layout as decode (editable header + read-only JSON preview)
 - **Payload** — Same claim form editor as decode
-- **Signing key** — HS256 secret or RS256 private key (PEM upload supported)
+- **Signing key** — HMAC secret or asymmetric private key (PEM upload supported)
 - **Generate JWT** — Manual sign button; key changes re-verify only
 - **Layout** — Full-width sections on large screens (token → editors → key)
 
@@ -58,7 +58,7 @@ A local, **client-side only** JSON and JWT tool built with Nuxt. Format and expl
 
 ### Shared across JWT tabs
 
-- **Algorithms** — HS256 (HMAC) and RS256 (RSA)
+- **Algorithms** — HS256/384/512, RS256/384/512, ES256/384/512, PS256/384/512, EdDSA (Ed25519)
 - **Header editor** — JSON with Format button and copy
 - **Claims helpers** — `iat` now, `exp` +1h, `exp` +24h, clear `exp`, Add claim, Copy JSON
 - **Copy buttons** — Token, header, payload JSON, and more

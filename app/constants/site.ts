@@ -3,7 +3,7 @@ export const SITE = {
   tagline:
     'Format JSON and encode or decode JWTs in your browser — nothing leaves your device',
   description:
-    'Free client-side JSON Utilities: pretty-print, minify, and sort JSON; explore data with a collapsible tree; encode and decode JWT tokens (HS256 and RS256); verify signatures. Your data never leaves the browser.',
+    'Free client-side JSON Utilities: pretty-print, minify, and sort JSON; explore data with a collapsible tree; encode and decode JWT tokens (HMAC, RSA, ECDSA, RSA-PSS, EdDSA); verify signatures. Your data never leaves the browser.',
   url: 'https://jsonutility.bijaybhandari.com',
   github: 'https://github.com/bijaybhandari1989/json-utility',
   author: 'Bijay Bhandari',
@@ -17,6 +17,9 @@ export const SITE = {
     'JWT verifier',
     'HS256',
     'RS256',
+    'ES256',
+    'EdDSA',
+    'PS256',
     'online JSON tool',
     'JWT debugger',
     'json utility',
@@ -43,7 +46,7 @@ export const JSON_LD = {
     'Collapsible JSON tree viewer',
     'Decode JWT tokens',
     'Encode and sign JWT tokens',
-    'Verify JWT signatures (HS256, RS256)',
+    'Verify JWT signatures (HMAC, RSA, ECDSA, RSA-PSS, EdDSA)',
   ],
   author: {
     '@type': 'Person',
