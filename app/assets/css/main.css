@@ -119,6 +119,13 @@ button {
   margin-bottom: 1.75rem;
 }
 
+.shell-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
 .shell-brand h1 {
   margin: 0;
   font-size: 1.625rem;

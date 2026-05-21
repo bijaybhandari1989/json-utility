@@ -2,7 +2,7 @@
 
 A local, **client-side only** JSON and JWT tool built with Nuxt. Format and explore JSON with a collapsible tree, and encode or decode tokens (HS256 / RS256), edit claims in a form, and verify signatures — all in your browser.
 
-**Live app:** [https://jsonutility.bijaybhandari.com/](https://jsonutility.bijaybhandari.com/)
+**Live app:** [https://jsonutility.bijaybhandari.com/](https://jsonutility.bijaybhandari.com/) · **Source:** [github.com/bijaybhandari1989/json-utility](https://github.com/bijaybhandari1989/json-utility)
 
 ## Features
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { SITE } from '~/constants/site'
+
 const { activeTab } = useJwtWorkbench()
 </script>
 
@@ -7,10 +9,13 @@ const { activeTab } = useJwtWorkbench()
     <div class="shell-inner">
       <header class="shell-header">
         <div class="shell-brand">
-          <h1>JSON Utilities</h1>
-          <p>Format JSON and encode or decode JWTs in your browser — nothing leaves your device</p>
+          <h1>{{ SITE.name }}</h1>
+          <p>{{ SITE.tagline }}</p>
         </div>
-        <ThemeToggle />
+        <div class="shell-header-actions">
+          <GitHubLink />
+          <ThemeToggle />
+        </div>
       </header>
 
       <AppTabBar v-model="activeTab" />
