@@ -1,4 +1,4 @@
-# Json utility
+# JSON Utilities
 
 A local, **client-side only** JSON and JWT tool built with Nuxt. Format and explore JSON with a collapsible tree, and encode or decode tokens (HS256 / RS256), edit claims in a form, and verify signatures — all in your browser.
 

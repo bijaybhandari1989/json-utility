@@ -12,12 +12,12 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Json utility',
+      title: 'JSON Utilities',
       meta: [
         {
           name: 'description',
           content:
-            'Client-side JSON utility: format and explore JSON, encode and decode JWTs (HS256 and RS256).',
+            'Client-side JSON Utilities: format and explore JSON, encode and decode JWTs (HS256 and RS256).',
         },
       ],
       link: [

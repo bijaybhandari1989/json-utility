@@ -1,7 +1,7 @@
 {
   "name": "json-utility",
   "version": "1.0.0",
-  "description": "Client-side JSON utility: format JSON and encode or decode JWTs.",
+  "description": "Client-side JSON Utilities: format JSON and encode or decode JWTs.",
   "license": "Apache-2.0",
   "type": "module",
   "private": true,

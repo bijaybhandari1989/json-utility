@@ -7,7 +7,7 @@ const { activeTab } = useJwtWorkbench()
     <div class="shell-inner">
       <header class="shell-header">
         <div class="shell-brand">
-          <h1>Json utility</h1>
+          <h1>JSON Utilities</h1>
           <p>Format JSON and encode or decode JWTs in your browser — nothing leaves your device</p>
         </div>
         <ThemeToggle />

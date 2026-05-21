@@ -23,7 +23,7 @@ function selectTab(id: AppTab) {
 </script>
 
 <template>
-  <nav class="tab-bar" role="tablist" aria-label="Json utility tools">
+  <nav class="tab-bar" role="tablist" aria-label="JSON Utilities tools">
     <button
       v-for="tab in tabs"
       :key="tab.id"
