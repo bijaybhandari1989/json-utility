@@ -33,6 +33,7 @@ ehthumbs.db
 *~
 
 # Editor / IDE
+.cursor
 .fleet
 .idea
 .vscode/*
