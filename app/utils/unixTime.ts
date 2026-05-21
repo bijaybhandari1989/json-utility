@@ -4,12 +4,17 @@ const JWT_TIME_CLAIMS = new Set(['iat', 'exp', 'nbf'])
 const MIN_UNIX_SECONDS = 631_152_000
 const MAX_UNIX_SECONDS = 4_102_444_800
 
+const dateFormatCache = new Map<number, string>()
+
 function formatUnixDate(seconds: number): string {
+  const cached = dateFormatCache.get(seconds)
+  if (cached !== undefined) return cached
+
   const date = new Date(seconds * 1000)
   if (Number.isNaN(date.getTime())) return ''
 
   // dateStyle/timeStyle cannot be combined with timeZoneName in Node/V8 Intl.
-  return new Intl.DateTimeFormat(undefined, {
+  const formatted = new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -18,6 +23,9 @@ function formatUnixDate(seconds: number): string {
     second: '2-digit',
     timeZoneName: 'short',
   }).format(date)
+
+  dateFormatCache.set(seconds, formatted)
+  return formatted
 }
 
 function isPlausibleUnixSeconds(seconds: number): boolean {

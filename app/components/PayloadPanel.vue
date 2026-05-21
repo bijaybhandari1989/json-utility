@@ -21,6 +21,16 @@ const claims = ref<PayloadClaim[]>([])
 const error = ref('')
 let syncingFromParent = false
 
+const claimTooltips = computed(() => {
+  const map = new Map<string, string>()
+  for (const claim of claims.value) {
+    if (claim.type !== 'number' && claim.type !== 'string') continue
+    const tooltip = getUnixTimestampTooltip(claim.key, claim.value)
+    if (tooltip) map.set(claim.id, tooltip)
+  }
+  return map
+})
+
 const jsonPreview = computed(() => {
   try {
     const obj = claimsToObject(claims.value)
@@ -81,8 +91,7 @@ function onTypeChange(claim: PayloadClaim) {
 }
 
 function claimValueTooltip(claim: PayloadClaim): string | undefined {
-  if (claim.type !== 'number' && claim.type !== 'string') return undefined
-  return getUnixTimestampTooltip(claim.key, claim.value) ?? undefined
+  return claimTooltips.value.get(claim.id)
 }
 </script>
 
@@ -146,15 +155,18 @@ function claimValueTooltip(claim: PayloadClaim): string | undefined {
             <option value="true">true</option>
             <option value="false">false</option>
           </select>
-          <input
+          <InstantTooltip
             v-else-if="claim.type === 'number'"
-            v-model="claim.value"
-            class="claim-value field-input"
-            :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
-            type="number"
-            placeholder="Value"
-            :title="claimValueTooltip(claim)"
+            :text="claimValueTooltip(claim)"
           >
+            <input
+              v-model="claim.value"
+              class="claim-value field-input"
+              :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
+              type="number"
+              placeholder="Value"
+            >
+          </InstantTooltip>
           <span
             v-else-if="claim.type === 'null'"
             class="claim-null"
@@ -167,16 +179,16 @@ function claimValueTooltip(claim: PayloadClaim): string | undefined {
             rows="2"
             spellcheck="false"
           />
-          <input
-            v-else
-            v-model="claim.value"
-            class="claim-value field-input"
-            :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
-            type="text"
-            placeholder="Value"
-            spellcheck="false"
-            :title="claimValueTooltip(claim)"
-          >
+          <InstantTooltip v-else :text="claimValueTooltip(claim)">
+            <input
+              v-model="claim.value"
+              class="claim-value field-input"
+              :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
+              type="text"
+              placeholder="Value"
+              spellcheck="false"
+            >
+          </InstantTooltip>
 
           <button
             type="button"

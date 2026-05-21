@@ -136,11 +136,12 @@ const valueIsUnix = computed(() =>
       :style="{ paddingLeft: depthPadding }"
     >
       <span v-if="name !== undefined" class="json-tree-key">{{ formatKey(name) }}:</span>
-      <span
-        class="json-tree-value"
-        :class="[valueTypeClass(value), { 'json-tree-value--unix': valueIsUnix }]"
-        :title="valueTooltip"
-      >{{ formatPrimitive(value) }}</span>
+      <InstantTooltip :text="valueTooltip">
+        <span
+          class="json-tree-value"
+          :class="[valueTypeClass(value), { 'json-tree-value--unix': valueIsUnix }]"
+        >{{ formatPrimitive(value) }}</span>
+      </InstantTooltip>
     </div>
   </div>
 </template>
