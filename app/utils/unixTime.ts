@@ -8,9 +8,14 @@ function formatUnixDate(seconds: number): string {
   const date = new Date(seconds * 1000)
   if (Number.isNaN(date.getTime())) return ''
 
+  // dateStyle/timeStyle cannot be combined with timeZoneName in Node/V8 Intl.
   return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'medium',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
     timeZoneName: 'short',
   }).format(date)
 }
