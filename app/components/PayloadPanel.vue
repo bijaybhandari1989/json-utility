@@ -7,6 +7,7 @@ import {
 } from '~/composables/usePayloadClaims'
 import { formatJson } from '~/composables/useJwt'
 import { snapshotJson, toPlainObject } from '~/utils/plain'
+import { getUnixTimestampTooltip } from '~/utils/unixTime'
 
 const model = defineModel<Record<string, unknown>>({ required: true })
 
@@ -78,6 +79,11 @@ function onTypeChange(claim: PayloadClaim) {
     claim.value = ''
   }
 }
+
+function claimValueTooltip(claim: PayloadClaim): string | undefined {
+  if (claim.type !== 'number' && claim.type !== 'string') return undefined
+  return getUnixTimestampTooltip(claim.key, claim.value) ?? undefined
+}
 </script>
 
 <template>
@@ -144,8 +150,10 @@ function onTypeChange(claim: PayloadClaim) {
             v-else-if="claim.type === 'number'"
             v-model="claim.value"
             class="claim-value field-input"
+            :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
             type="number"
             placeholder="Value"
+            :title="claimValueTooltip(claim)"
           >
           <span
             v-else-if="claim.type === 'null'"
@@ -163,9 +171,11 @@ function onTypeChange(claim: PayloadClaim) {
             v-else
             v-model="claim.value"
             class="claim-value field-input"
+            :class="{ 'claim-value--unix': claimValueTooltip(claim) }"
             type="text"
             placeholder="Value"
             spellcheck="false"
+            :title="claimValueTooltip(claim)"
           >
 
           <button
@@ -221,6 +231,10 @@ function onTypeChange(claim: PayloadClaim) {
   font-size: 0.78rem;
   resize: vertical;
   min-height: 2.2rem;
+}
+
+.claim-value--unix {
+  cursor: help;
 }
 
 .claim-null {

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  getUnixTimestampTooltip,
+  isUnixTimestampDisplay,
+} from '~/utils/unixTime'
+
 const props = defineProps<{
   name?: string | number
   value: unknown
@@ -77,6 +82,14 @@ function valueTypeClass(value: unknown): string {
       return ''
   }
 }
+
+const valueTooltip = computed(() =>
+  getUnixTimestampTooltip(props.name, props.value) ?? undefined,
+)
+
+const valueIsUnix = computed(() =>
+  isUnixTimestampDisplay(props.name, props.value),
+)
 </script>
 
 <template>
@@ -123,7 +136,11 @@ function valueTypeClass(value: unknown): string {
       :style="{ paddingLeft: depthPadding }"
     >
       <span v-if="name !== undefined" class="json-tree-key">{{ formatKey(name) }}:</span>
-      <span class="json-tree-value" :class="valueTypeClass(value)">{{ formatPrimitive(value) }}</span>
+      <span
+        class="json-tree-value"
+        :class="[valueTypeClass(value), { 'json-tree-value--unix': valueIsUnix }]"
+        :title="valueTooltip"
+      >{{ formatPrimitive(value) }}</span>
     </div>
   </div>
 </template>
@@ -196,6 +213,13 @@ function valueTypeClass(value: unknown): string {
 .json-tree-value.json-tree-null {
   color: var(--text-muted);
   font-style: italic;
+}
+
+.json-tree-value--unix {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in srgb, var(--text-subtle) 70%, transparent);
+  text-underline-offset: 0.15em;
 }
 
 .json-tree-close {

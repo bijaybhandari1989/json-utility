@@ -7,9 +7,11 @@ const props = withDefaults(
     collapseDefault?: JsonTreeCollapseDefault
     /** Characters of indent per tree depth (2 or 4) */
     indentSpaces?: number
+    showToolbar?: boolean
   }>(),
   {
     indentSpaces: 2,
+    showToolbar: true,
   },
 )
 
@@ -85,7 +87,7 @@ defineExpose({ expandAll, collapseAll })
 
 <template>
   <div class="json-tree-viewer">
-    <div class="json-tree-toolbar">
+    <div v-if="showToolbar" class="json-tree-toolbar">
       <button type="button" class="btn btn-sm" @click="expandAll">
         Expand all
       </button>

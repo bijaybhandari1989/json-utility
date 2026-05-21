@@ -46,7 +46,11 @@ const payloadPreview = computed(() => formatJson(props.payloadObject))
           <span class="decoded-block-label">Payload (read-only)</span>
           <CopyButton :text="payloadPreview" label="Copy JSON" />
         </div>
-        <pre class="json-readonly">{{ payloadPreview }}</pre>
+        <CollapsibleJsonViewer
+          :data="payloadObject"
+          :show-toolbar="false"
+          class="decoded-payload-tree"
+        />
       </div>
     </div>
   </section>
@@ -79,5 +83,10 @@ const payloadPreview = computed(() => formatJson(props.payloadObject))
   display: flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+.decoded-payload-tree :deep(.json-tree-scroll) {
+  min-height: 8rem;
+  max-height: 20rem;
 }
 </style>
