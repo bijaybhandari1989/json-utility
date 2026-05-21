@@ -10,12 +10,9 @@ import {
   syncTokenFromEditors,
   verifyToken,
 } from '~/composables/useJwt'
+import { SAMPLE_JWT, SAMPLE_SECRET } from '~/constants/samples'
 
 export type AppTab = 'encode' | 'decode' | 'format'
-
-const SAMPLE_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-const SAMPLE_SECRET = 'your-256-bit-secret'
 
 function createWorkbench() {
   const activeTab = ref<AppTab>('decode')
@@ -245,13 +242,18 @@ function createWorkbench() {
     await syncJwtFromEditors()
   }
 
-  function loadSample() {
-    activeTab.value = 'decode'
-    token.value = SAMPLE_TOKEN
+  function applySampleData() {
+    token.value = SAMPLE_JWT
     keyMaterial.value = SAMPLE_SECRET
     algorithm.value = 'HS256'
     keyFormat.value = 'text'
     keyRole.value = 'secret'
+  }
+
+  function loadSample() {
+    activeTab.value = 'decode'
+    applySampleData()
+    void decodeFromToken()
   }
 
   function clearAll() {
@@ -284,6 +286,11 @@ function createWorkbench() {
     payloadObject.value = next
     payloadError.value = ''
   }
+
+  suppressTokenDecode.value = true
+  applySampleData()
+  suppressTokenDecode.value = false
+  void decodeFromToken()
 
   return {
     activeTab,

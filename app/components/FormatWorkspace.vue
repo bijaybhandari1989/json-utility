@@ -3,7 +3,7 @@ import { SAMPLE_JSON } from '~/constants/samples'
 import type { JsonFormatStyle } from '~/types/jsonFormat'
 import { JSON_FORMAT_OPTIONS, formatJsonValue } from '~/utils/jsonFormat'
 
-const jsonInput = ref('')
+const jsonInput = ref(SAMPLE_JSON)
 const style = ref<JsonFormatStyle>('pretty')
 
 const formatted = computed(() => formatJsonValue(jsonInput.value, style.value))
