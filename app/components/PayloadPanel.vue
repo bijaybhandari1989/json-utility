@@ -239,6 +239,12 @@ function onTypeChange(claim: PayloadClaim) {
   line-height: 1;
 }
 
+@media (min-width: 1440px) {
+  .claim-row {
+    grid-template-columns: minmax(7rem, 1fr) 6.5rem minmax(10rem, 2.5fr) auto;
+  }
+}
+
 @media (max-width: 640px) {
   .claim-row {
     grid-template-columns: 1fr 1fr;
